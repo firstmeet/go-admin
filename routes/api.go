@@ -78,6 +78,7 @@ func Route() {
 			goods.POST("",Goods.Create)
 			goods.PUT("/:id",Goods.Update)
 			goods.DELETE("/:id",Goods.Delete)
+			goods.GET("/:id",Goods.Show)
 		}
 		goods_type:=r.Group("/goods_type")
 		{

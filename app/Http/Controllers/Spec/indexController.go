@@ -33,13 +33,14 @@ func Index(c *gin.Context) {
 	var spec []Spec
 
 	is_pag:=c.Query("pag")
+	goods_type_id:=c.Query("goods_type_id")
 	if is_pag=="1"{
 		current_page:=utils.StringToInt(c.Query("current_page"))
 		page_size:=utils.StringToInt(c.Query("page_size"))
 		offset:=page_size*(current_page-1)
-		sqls.Db.Set("gorm:auto_preload", true).Limit(page_size).Offset(offset).Find(&spec)
+		sqls.Db.Set("gorm:auto_preload", true).Where("goods_type_id=?",goods_type_id).Limit(page_size).Offset(offset).Find(&spec)
 	}else{
-		sqls.Db.Set("gorm:auto_preload", true).Find(&spec)
+		sqls.Db.Set("gorm:auto_preload", true).Where("goods_type_id=?",goods_type_id).Find(&spec)
 	}
 
 	c.JSON(200, gin.H{

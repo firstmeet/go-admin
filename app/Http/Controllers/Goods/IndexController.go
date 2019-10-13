@@ -88,6 +88,7 @@ func Create(c *gin.Context) {
 		Status:    utils.StringToInt(c.PostForm("status")),
 		CreatedAt: utils.JSONTime{time.Now()},
 	}
+	sqls.Db.Create(&goods).Related(&goods.Category)
 	sku_list:=c.PostForm("sku")
 	if sku_list !="" {
 		var sku []Skus
@@ -114,14 +115,14 @@ func Create(c *gin.Context) {
 			skus.SpecText=name_string
 			skus.OriginPrice=float64(utils.StringToInt(v.OriginPrice))
 			skus.SalePrice=float64(utils.StringToInt(v.SalePrice))
-			skus.GoodsID=utils.StringToInt(c.Param("id"))
+			skus.GoodsID=goods.ID
 			skus.SkuCode=strconv.Itoa(int(time.Now().UnixNano()))
 			skus.CreatedAt=utils.JSONTime{time.Now()}
 			sqls.Db.Create(&skus)
 		}
 	}
 	//var category Category.Category
-	sqls.Db.Create(&goods).Related(&goods.Category)
+
 	c.JSON(200, gin.H{
 		"data": goods,
 	})
@@ -177,11 +178,10 @@ func Update(c *gin.Context) {
 
 }
 func Show(c *gin.Context) {
-	name := c.PostForm("title")
-	var element []Goods
-	sqls.Db.Where("title like ?", "%"+name+"%").Find(&element)
+	var goods Goods
+	sqls.Db.Set("gorm:auto_preload", true).Where("id= ?", c.Param("id")).First(&goods)
 	c.JSON(200, gin.H{
-		"data": element,
+		"data": goods,
 	})
 }
 func Delete(c *gin.Context) {
